@@ -14,6 +14,7 @@ const paypal = require('paypal-rest-sdk');
 const lob = require('lob')(process.env.LOB_KEY);
 const ig = require('instagram-node').instagram();
 const axios = require('axios');
+const jwt = require('jwt-simple');
 
 /**
  * GET /api
@@ -23,6 +24,55 @@ exports.getApi = (req, res) => {
   res.render('api/index', {
     title: 'API Examples'
   });
+};
+
+
+/**
+ * GET /api/jwt
+ * Get a JSON Web Token
+ */
+
+ /**
+header:
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+
+payload:
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+
+secret: secret
+
+
+https://en.wikipedia.org/wiki/JSON_Web_Token
+
+  */
+exports.getJWT = (req, res) => {
+  var headers = {
+    alg: req.headers.alg || 'HS256', // Token type. If present, it is recommended to set this to JWT.
+    cty: req.headers.cty || '', // Content type. If nested signing or encryption is employed, it is recommended to set this to JWT, otherwise omit this field[1].
+    tpy: req.headers.typ || '' // Token type. If present, it is recommended to set this to JWT.
+  };
+
+  var claims = {
+    iss: req.query.iss || '', // Issuer.	Identifies principal that issued the JWT.
+    sub: req.query.sub || '', // Subject. Identifies the subject of the JWT.
+    aud: req.query.aud || '', // Audience. Identifies the recipients that the JWT is intended for. Each principal intended to process the JWT must identify itself with a value in the audience claim. If the principal processing the claim does not identify itself with a value in the aud claim when this claim is present, then the JWT must be rejected.
+    exp: req.query.exp || '', // Expiration Time. Identifies the expiration time on and after which the JWT must not be accepted for processing. The value must be a NumericDate[10]: either an integer or decimal, representing seconds past 1970-01-01 00:00:00Z.
+    nbf: req.query.nbf || '', // Not Before. Identifies the time on which the JWT will start to be accepted for processing. The value must be a NumericDate.
+    iat: parseInt(req.query.iat) || Math.floor(new Date() / 1000), //Issued at. Identifies the time at which the JWT was issued. The value must be a NumericDate.
+    jti: req.query.jti || '' // JWT ID. Case sensitive unique identifier of the token even among different issuers.
+  };
+
+  var secret = req.query.secret || 'secretterces';
+
+  var token = jwt.encode(claims, secret, headers.alg, headers);
+  res.send(token);
 };
 
 /**

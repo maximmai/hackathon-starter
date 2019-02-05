@@ -177,6 +177,12 @@ app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuth
 app.get('/api/google-maps', apiController.getGoogleMaps);
 
 /**
+ * JWT
+ * Get a JSON Web Token
+ */
+app.get('/api/jwt', apiController.getJWT);
+
+/**
  * OAuth authentication routes. (Sign in)
  */
 app.get('/auth/instagram', passport.authenticate('instagram'));
